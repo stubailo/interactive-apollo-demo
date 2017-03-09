@@ -5,43 +5,47 @@ import './App.css';
 
 import { networkInterface } from './schema';
 
-function Benefits({ data: { benefits } }) {
-  return (
-    <div className="benefits">
-      {benefits && benefits.map(benefit => <Benefit benefit={benefit} />)}
-    </div>
-  );
-}
-
-const GraphQLBenefits = graphql(gql`
+const query = `
   {
     benefits(first: 1) {
       title
       content
     }
   }
-`)(Benefits);
+`;
+
+function Benefits({ data: { benefits } }) {
+  return (
+    <div className="benefits">
+      {benefits && benefits.map(benefit =>
+        <Benefit benefit={benefit} key={benefit.title} />)}
+    </div>
+  );
+}
+
+function GraphQLBenefits({ query }) {
+  return React.createElement(
+    graphql(gql`${query}`)(Benefits)
+  );
+}
 
 function Benefit({ benefit }) {
   return (
     <div className="benefit">
-      <h3>{benefit.title}</h3>
-      <p>{benefit.content}</p>
+      {benefit.title && <h3>{benefit.title}</h3>}
+      {benefit.content && <p>{benefit.content}</p>}
     </div>
   );
 }
 
 function createClient() {
-  console.log('created client');
-  return new ApolloClient({
-    networkInterface,
-  });
+  return new ApolloClient({ networkInterface });
 }
 
 export default function App() {
   return (
     <ApolloProvider client={createClient()}>
-      <GraphQLBenefits />
+      <GraphQLBenefits query={query} />
     </ApolloProvider>
   );
 }
