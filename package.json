@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "graphql": "^0.9.1",
+    "graphql-tools": "^0.10.1",
     "react": "^15.4.2",
+    "react-apollo": "^0.13.3",
     "react-dom": "^15.4.2"
   },
   "devDependencies": {
