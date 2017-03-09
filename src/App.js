@@ -5,16 +5,11 @@ import './App.css';
 
 import { networkInterface } from './schema';
 
-const query = `
-  {
-    benefits(first: 1) {
-      title
-      content
-    }
+function Benefits({ data: { benefits, error } }) {
+  if (error) {
+    return <div>{error.message}</div>;
   }
-`;
 
-function Benefits({ data: { benefits } }) {
   return (
     <div className="benefits">
       {benefits && benefits.map(benefit =>
@@ -24,9 +19,15 @@ function Benefits({ data: { benefits } }) {
 }
 
 function GraphQLBenefits({ query }) {
-  return React.createElement(
-    graphql(gql`${query}`)(Benefits)
-  );
+  let queryAst;
+  try {
+    queryAst = gql`${query}`;
+    return React.createElement(
+      graphql(queryAst)(Benefits)
+    );
+  } catch (e) {
+    return <div>Error</div>;
+  }
 }
 
 function Benefit({ benefit }) {
@@ -38,6 +39,44 @@ function Benefit({ benefit }) {
   );
 }
 
+class QueryBenefitSplit extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      query: `
+        {
+          benefits(first: 1) {
+            title
+            content
+          }
+        }
+      `,
+    };
+
+    this._handleQueryChange = this._handleQueryChange.bind(this);
+  }
+
+  _handleQueryChange(event) {
+    this.setState({
+      query: event.target.value,
+    });
+  }
+
+  render() {
+    return (
+      <div className="query-benefit-container">
+        <textarea
+          onChange={this._handleQueryChange}
+          rows="10"
+          cols="40"
+          value={this.state.query}
+        />
+        <GraphQLBenefits query={this.state.query} />
+      </div>
+    )
+  }
+}
+
 function createClient() {
   return new ApolloClient({ networkInterface });
 }
@@ -45,7 +84,7 @@ function createClient() {
 export default function App() {
   return (
     <ApolloProvider client={createClient()}>
-      <GraphQLBenefits query={query} />
+      <QueryBenefitSplit />
     </ApolloProvider>
   );
 }
