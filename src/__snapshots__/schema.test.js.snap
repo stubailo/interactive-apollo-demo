@@ -1,0 +1,11 @@
+exports[`test runs a basic query 1`] = `
+Object {
+  "data": Object {
+    "benefits": Array [
+      Object {
+        "title": "ASDF",
+      },
+    ],
+  },
+}
+`;
