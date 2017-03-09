@@ -1,16 +1,47 @@
 import React from 'react';
+import { gql, ApolloClient, ApolloProvider, graphql } from 'react-apollo';
+
 import './App.css';
 
-import { fetchQuery } from './schema';
+import { networkInterface } from './schema';
 
-export default function App() {
+function Benefits({ data: { benefits } }) {
   return (
-    <div>Hello world!</div>
+    <div className="benefits">
+      {benefits && benefits.map(benefit => <Benefit benefit={benefit} />)}
+    </div>
   );
 }
 
-fetchQuery({
-  query: `{ benefits(first: 1) { title } }`,
-}).then(( result ) => {
-  console.log(result);
-});
+const GraphQLBenefits = graphql(gql`
+  {
+    benefits(first: 1) {
+      title
+      content
+    }
+  }
+`)(Benefits);
+
+function Benefit({ benefit }) {
+  return (
+    <div className="benefit">
+      <h3>{benefit.title}</h3>
+      <p>{benefit.content}</p>
+    </div>
+  );
+}
+
+function createClient() {
+  console.log('created client');
+  return new ApolloClient({
+    networkInterface,
+  });
+}
+
+export default function App() {
+  return (
+    <ApolloProvider client={createClient()}>
+      <GraphQLBenefits />
+    </ApolloProvider>
+  );
+}

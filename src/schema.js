@@ -1,5 +1,13 @@
-import { graphql } from 'graphql';
+import { graphql, print } from 'graphql';
 import { makeExecutableSchema } from 'graphql-tools';
+
+const data = [
+  {
+    title: 'ASDF',
+    content: 'ASDF [link](example.com) other content',
+  },
+];
+
 
 const typeDefs = `
   type Query {
@@ -30,9 +38,8 @@ export function fetchQuery({ query, variables }) {
   return graphql(schema, query, null, null, variables);
 }
 
-const data = [
-  {
-    title: 'ASDF',
-    content: 'ASDF [link](example.com) other content',
+export const networkInterface = {
+  query({ query: queryAst, variables }) {
+    return fetchQuery({ query: print(queryAst), variables });
   },
-];
+};
